@@ -36,7 +36,7 @@ export default function SoftwareEstudianteForm() {
   const fetchSolicitudes = async () => {
     setIsLoadingSolicitudes(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/solicitudes-software`)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/software-solicitudes`)
       if (!response.ok) throw new Error("No se pudieron obtener las solicitudes")
       const data = await response.json()
       setSolicitudes(data)
