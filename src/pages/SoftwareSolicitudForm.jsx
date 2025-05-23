@@ -29,54 +29,24 @@ export default function SoftwareSolicitudForm() {
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            _id: "1",
-            docente_tutor: "Dr. Carlos Mendoza",
-            facultad: "Ingeniería",
-            estudiante_programa_academico: "Ingeniería de Sistemas",
-            nombre_asignatura: "Programación Avanzada",
-            estado: "Activa",
-            estudiantes_asignados: 15,
-            createdAt: "2024-01-15T10:00:00Z",
-          },
-          {
-            _id: "2",
-            docente_tutor: "Dra. Ana García",
-            facultad: "Ingeniería",
-            estudiante_programa_academico: "Ingeniería de Software",
-            nombre_asignatura: "Base de Datos",
-            estado: "Activa",
-            estudiantes_asignados: 12,
-            createdAt: "2024-01-16T14:30:00Z",
-          },
-          {
-            _id: "3",
-            docente_tutor: "Mg. Luis Rodríguez",
-            facultad: "Ciencias Económicas",
-            estudiante_programa_academico: "Administración de Empresas",
-            nombre_asignatura: "Sistemas de Información Gerencial",
-            estado: "Pendiente",
-            estudiantes_asignados: 8,
-            createdAt: "2024-01-17T09:15:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
-      }
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/software-solicitudes`)
+      if (!response.ok) throw new Error("No se pudieron obtener las solicitudes")
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
+  }
 
-    if (showTable) {
-      loadTableData()
-    }
-  }, [showTable])
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -197,56 +167,70 @@ export default function SoftwareSolicitudForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const newId = `SOL-${Date.now()}`
-
-      setNotification({
-        type: "success",
-        message: `Solicitud de software registrada exitosamente. ID: ${newId}`,
-      })
-
-      // Agregar a la tabla local
-      const newRecord = {
-        _id: newId,
-        ...formData,
-        estado: "Pendiente",
-        estudiantes_asignados: 0,
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        docente_tutor: "",
-        facultad: "",
-        estudiante_programa_academico: "",
-        nombre_asignatura: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar la solicitud de software: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
+
+  setIsSubmitting(true)
+
+  try {
+    const payload = {
+      ...formData,
+      estado: "Pendiente",
+      estudiantes_asignados: 0,
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/software-solicitudes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error al registrar la solicitud")
+    }
+
+    const saved = await response.json()
+
+    setNotification({
+      type: "success",
+      message: `Solicitud de software registrada exitosamente.`,
+    })
+
+    const newRecord = {
+      _id: saved._id || `SOL-${Date.now()}`,
+      ...payload,
+      createdAt: saved.createdAt || new Date().toISOString(),
+    }
+
+    setTableData((prev) => [newRecord, ...prev])
+
+    // Limpiar formulario
+    setFormData({
+      docente_tutor: "",
+      facultad: "",
+      estudiante_programa_academico: "",
+      nombre_asignatura: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar la solicitud de software: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
