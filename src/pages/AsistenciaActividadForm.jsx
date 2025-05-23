@@ -37,72 +37,27 @@ export default function AsistenciaActividadForm() {
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            id: 1,
-            nombre_estudiante: "Carlos Andrés Ruiz",
-            numero_documento: "1234567890",
-            estudiante_programa_academico_academico: "Psicología",
-            semestre: 4,
-            nombre_actividad: "Taller de Manejo del Estrés",
-            modalidad: "presencial",
-            tipo_actividad: "Taller grupal",
-            fecha_actividad: "2024-01-20",
-            hora_inicio: "09:00",
-            hora_fin: "11:00",
-            modalidad_registro: "digital",
-            observaciones: "Participación activa en el taller",
-            createdAt: "2024-01-20T09:00:00Z",
-          },
-          {
-            id: 2,
-            nombre_estudiante: "Laura Sofía Martínez",
-            numero_documento: "9876543210",
-            estudiante_programa_academico_academico: "Administración de Empresas",
-            semestre: 6,
-            nombre_actividad: "Conferencia de Liderazgo",
-            modalidad: "virtual",
-            tipo_actividad: "Conferencia",
-            fecha_actividad: "2024-01-21",
-            hora_inicio: "14:00",
-            hora_fin: "16:00",
-            modalidad_registro: "manual",
-            observaciones: "Excelente participación en preguntas",
-            createdAt: "2024-01-21T14:00:00Z",
-          },
-          {
-            id: 3,
-            nombre_estudiante: "Miguel Ángel Torres",
-            numero_documento: "5555666677",
-            estudiante_programa_academico_academico: "Ingeniería de Sistemas",
-            semestre: 8,
-            nombre_actividad: "Sesión de Mindfulness",
-            modalidad: "híbrida",
-            tipo_actividad: "Sesión terapéutica",
-            fecha_actividad: "2024-01-22",
-            hora_inicio: "10:30",
-            hora_fin: "12:00",
-            modalidad_registro: "digital",
-            observaciones: "Primera sesión, mostró interés",
-            createdAt: "2024-01-22T10:30:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/asistencias-actividad`)
+      if (!response.ok) {
+        throw new Error(`Error al obtener asistencias: ${response.statusText}`)
       }
-    }
 
-    if (showTable) {
-      loadTableData()
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
-  }, [showTable])
+  }
+
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -263,60 +218,72 @@ export default function AsistenciaActividadForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setNotification({
-        type: "success",
-        message: "Asistencia a actividad registrada exitosamente",
-      })
-
-      // Agregar a la tabla local
-      const newRecord = {
-        id: Date.now(),
-        ...formData,
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        nombre_estudiante: "",
-        numero_documento: "",
-        estudiante_programa_academico_academico: "",
-        semestre: "",
-        nombre_actividad: "",
-        modalidad: "",
-        tipo_actividad: "",
-        fecha_actividad: "",
-        hora_inicio: "",
-        hora_fin: "",
-        modalidad_registro: "",
-        observaciones: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar la asistencia: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
+
+  setIsSubmitting(true)
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/asistencias-actividad`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error desconocido al registrar la asistencia")
+    }
+
+    const savedRecord = await response.json()
+
+    setNotification({
+      type: "success",
+      message: "Asistencia a actividad registrada exitosamente",
+    })
+
+    // Agregar a la tabla local
+    const newRecord = {
+      id: savedRecord.id || Date.now(),
+      ...formData,
+      createdAt: new Date().toISOString(),
+    }
+    setTableData((prev) => [newRecord, ...prev])
+
+    // Limpiar formulario
+    setFormData({
+      nombre_estudiante: "",
+      numero_documento: "",
+      estudiante_programa_academico_academico: "",
+      semestre: "",
+      nombre_actividad: "",
+      modalidad: "",
+      tipo_actividad: "",
+      fecha_actividad: "",
+      hora_inicio: "",
+      hora_fin: "",
+      modalidad_registro: "",
+      observaciones: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar la asistencia: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
