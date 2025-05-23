@@ -40,7 +40,7 @@ export default function AsistenciaActividadForm() {
   const loadTableData = async () => {
     setIsLoadingTable(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/asistencias-actividad`)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/asistencias-actividades`)
       if (!response.ok) {
         throw new Error(`Error al obtener asistencias: ${response.statusText}`)
       }
@@ -231,7 +231,7 @@ export default function AsistenciaActividadForm() {
   setIsSubmitting(true)
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/asistencias-actividad`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/asistencias-actividades`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
