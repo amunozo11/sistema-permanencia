@@ -73,7 +73,7 @@ export default function CSVUploader({ onDataLoaded }) {
       const formData = new FormData()
       formData.append("file", file)
       // Enviar el archivo al backend
-      const response = await fetch("/api/upload-csv", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-csv`, {
         method: "POST",
         body: formData,
       })

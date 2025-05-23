@@ -16,7 +16,7 @@ export default function EstratoServicioChart() {
       setIsLoading(true)
       try {
         // Obtener datos de la API
-        const response = await fetch("/api/datos-permanencia")
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/datos-permanencia`)
         if (!response.ok) {
           throw new Error("Error al cargar datos")
         }

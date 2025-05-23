@@ -64,7 +64,7 @@ export default function HomePage() {
       setIsLoading(true)
       try {
         // Cargar datos desde el backend
-        const response = await fetch("/api/datos-permanencia")
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/datos-permanencia`)
         if (!response.ok) {
           throw new Error("Error al cargar datos")
         }
@@ -72,7 +72,7 @@ export default function HomePage() {
         setData(data)
 
         // Cargar estadísticas
-        const statsResponse = await fetch("/api/estadisticas")
+        const statsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/estadisticas`)
         if (!statsResponse.ok) {
           throw new Error("Error al cargar estadísticas")
         }
@@ -92,7 +92,7 @@ export default function HomePage() {
   const handleDataLoaded = (newData) => {
     setData(newData)
     // Después de cargar nuevos datos, actualizar las estadísticas
-    fetch("/api/estadisticas")
+    fetch(`${import.meta.env.VITE_API_URL}/api/estadisticas`)
       .then((response) => response.json())
       .then((stats) => setStats(stats))
       .catch((error) => console.error("Error al actualizar estadísticas:", error))

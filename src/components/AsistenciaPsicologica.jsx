@@ -26,7 +26,7 @@ const AsistenciaPsicologica = () => {
 
     try {
       const res = await fetch(
-        "/api/PostRemisionPsicologica.php",
+        `${import.meta.env.VITE_API_URL}/api/PostRemisionPsicologica.php`,
         {
           method: "POST",
           headers: {
