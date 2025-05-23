@@ -47,105 +47,28 @@ export default function GrupalSolicitudForm() {
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            id: 1,
-            fecha_solicitud: "2024-01-15",
-            nombre_docente_permanencia: "Dra. Carmen Rodríguez",
-            celular_permanencia: "3001234567",
-            correo_permanencia: "carmen.rodriguez@upc.edu.co",
-            estudiante_programa_academico_permanencia: "Psicología",
-            tipo_poblacion: "Estudiantes de primer semestre",
-            nombre_docente_asignatura: "Mg. Luis Pérez",
-            celular_docente_asignatura: "3009876543",
-            correo_docente_asignatura: "luis.perez@upc.edu.co",
-            estudiante_programa_academico_docente_asignatura: "Psicología",
-            asignatura_intervenir: "Introducción a la Psicología",
-            grupo: "1",
-            semestre: "1",
-            numero_estudiantes: "25",
-            tematica_sugerida: "Técnicas de estudio y manejo del tiempo",
-            fecha_estudiante_programa_academicoda: "2024-01-25",
-            hora: "10:00",
-            aula: "201",
-            bloque: "A",
-            sede: "Principal",
-            estado: "se hizo",
-            motivo: "",
-            efectividad: "Alta",
-            createdAt: "2024-01-15T10:00:00Z",
-          },
-          {
-            id: 2,
-            fecha_solicitud: "2024-01-18",
-            nombre_docente_permanencia: "Dr. Roberto Silva",
-            celular_permanencia: "3005556666",
-            correo_permanencia: "roberto.silva@upc.edu.co",
-            estudiante_programa_academico_permanencia: "Ingeniería",
-            tipo_poblacion: "Estudiantes en riesgo académico",
-            nombre_docente_asignatura: "Ing. María González",
-            celular_docente_asignatura: "3007778888",
-            correo_docente_asignatura: "maria.gonzalez@upc.edu.co",
-            estudiante_programa_academico_docente_asignatura: "Ingeniería de Sistemas",
-            asignatura_intervenir: "Cálculo Diferencial",
-            grupo: "2",
-            semestre: "2",
-            numero_estudiantes: "18",
-            tematica_sugerida: "Estrategias para mejorar el rendimiento en matemáticas",
-            fecha_estudiante_programa_academicoda: "2024-01-28",
-            hora: "14:00",
-            aula: "305",
-            bloque: "B",
-            sede: "Principal",
-            estado: "no se hizo",
-            motivo: "Conflicto de horarios con el docente",
-            efectividad: "N/A",
-            createdAt: "2024-01-18T14:30:00Z",
-          },
-          {
-            id: 3,
-            fecha_solicitud: "2024-01-20",
-            nombre_docente_permanencia: "Mg. Ana Martínez",
-            celular_permanencia: "3002223333",
-            correo_permanencia: "ana.martinez@upc.edu.co",
-            estudiante_programa_academico_permanencia: "Administración",
-            tipo_poblacion: "Estudiantes de semestres avanzados",
-            nombre_docente_asignatura: "Dr. Carlos Mendoza",
-            celular_docente_asignatura: "3004445555",
-            correo_docente_asignatura: "carlos.mendoza@upc.edu.co",
-            estudiante_programa_academico_docente_asignatura: "Administración de Empresas",
-            asignatura_intervenir: "Gestión Empresarial",
-            grupo: "1",
-            semestre: "7",
-            numero_estudiantes: "22",
-            tematica_sugerida: "Preparación para la vida laboral",
-            fecha_estudiante_programa_academicoda: "2024-02-05",
-            hora: "09:00",
-            aula: "102",
-            bloque: "C",
-            sede: "Principal",
-            estado: "espera",
-            motivo: "Pendiente confirmación de disponibilidad del aula",
-            efectividad: "Pendiente",
-            createdAt: "2024-01-20T09:15:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/intervenciones-grupales`)
+      if (!response.ok) {
+        throw new Error(`Error al obtener intervenciones: ${response.statusText}`)
       }
-    }
 
-    if (showTable) {
-      loadTableData()
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
-  }, [showTable])
+  }
+
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
+
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -373,71 +296,87 @@ export default function GrupalSolicitudForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setNotification({
-        type: "success",
-        message: "Intervención grupal registrada exitosamente",
-      })
-
-      // Agregar a la tabla local
-      const newRecord = {
-        id: Date.now(),
-        ...formData,
-        efectividad: formData.estado === "se hizo" ? "Pendiente evaluación" : "N/A",
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        fecha_solicitud: "",
-        nombre_docente_permanencia: "",
-        celular_permanencia: "",
-        correo_permanencia: "",
-        estudiante_programa_academico_permanencia: "",
-        tipo_poblacion: "",
-        nombre_docente_asignatura: "",
-        celular_docente_asignatura: "",
-        correo_docente_asignatura: "",
-        estudiante_programa_academico_docente_asignatura: "",
-        asignatura_intervenir: "",
-        grupo: "",
-        semestre: "",
-        numero_estudiantes: "",
-        tematica_sugerida: "",
-        fecha_estudiante_programa_academicoda: "",
-        hora: "",
-        aula: "",
-        bloque: "",
-        sede: "",
-        estado: "",
-        motivo: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar la intervención grupal: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
+
+  setIsSubmitting(true)
+
+  try {
+    const payload = {
+      ...formData,
+      efectividad: formData.estado === "se hizo" ? "Pendiente evaluación" : "N/A",
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/intervenciones-grupales`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error desconocido al registrar la intervención")
+    }
+
+    const savedRecord = await response.json()
+
+    setNotification({
+      type: "success",
+      message: "Intervención grupal registrada exitosamente",
+    })
+
+    const newRecord = {
+      id: savedRecord.id || Date.now(),
+      ...payload,
+      createdAt: new Date().toISOString(),
+    }
+
+    setTableData((prev) => [newRecord, ...prev])
+
+    // Limpiar formulario
+    setFormData({
+      fecha_solicitud: "",
+      nombre_docente_permanencia: "",
+      celular_permanencia: "",
+      correo_permanencia: "",
+      estudiante_programa_academico_permanencia: "",
+      tipo_poblacion: "",
+      nombre_docente_asignatura: "",
+      celular_docente_asignatura: "",
+      correo_docente_asignatura: "",
+      estudiante_programa_academico_docente_asignatura: "",
+      asignatura_intervenir: "",
+      grupo: "",
+      semestre: "",
+      numero_estudiantes: "",
+      tematica_sugerida: "",
+      fecha_estudiante_programa_academicoda: "",
+      hora: "",
+      aula: "",
+      bloque: "",
+      sede: "",
+      estado: "",
+      motivo: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar la intervención grupal: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
