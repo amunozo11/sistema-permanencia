@@ -459,7 +459,7 @@ export default function HomePage() {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">Retención Estudiantil</p>
+                        <p className="text-sm text-gray-500 mb-1">Carga Estudiantil</p>
                         <h3 className="text-3xl font-bold text-gray-800">{additionalKPIs.retencion}%</h3>
                       </div>
                       <div className="bg-purple-100 p-3 rounded-lg">
