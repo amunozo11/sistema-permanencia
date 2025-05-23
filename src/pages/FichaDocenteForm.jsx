@@ -47,99 +47,27 @@ export default function FichaDocenteForm() {
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            id: 1,
-            nombres_apellidos: "Dr. Carlos Alberto Mendoza García",
-            documento_identidad: "1234567890",
-            fecha_nacimiento: "15/03/1980",
-            direccion_residencia: "Calle 15 #12-34, Valledupar",
-            celular: "3001234567",
-            correo_institucional: "carlos.mendoza@upc.edu.co",
-            correo_personal: "carlos.mendoza@gmail.com",
-            preferencia_correo: "institucional",
-            facultad: "Ingeniería",
-            estudiante_programa_academico: "Ingeniería de Sistemas",
-            asignaturas: "Programación Avanzada, Base de Datos",
-            creditos_asignaturas: "8",
-            ciclo_formacion: "Profesional",
-            pregrado: "Ingeniería de Sistemas",
-            especializacion: "Desarrollo de Software",
-            maestria: "Ciencias de la Computación",
-            doctorado: "Inteligencia Artificial",
-            grupo_investigacion: "sí",
-            cual_grupo: "GIDIS - Grupo de Investigación en Desarrollo de Software",
-            horas_semanales: "40",
-            estado: "Activo",
-            createdAt: "2024-01-15T10:00:00Z",
-          },
-          {
-            id: 2,
-            nombres_apellidos: "Dra. Ana María Rodríguez Silva",
-            documento_identidad: "9876543210",
-            fecha_nacimiento: "22/07/1975",
-            direccion_residencia: "Carrera 20 #8-45, Valledupar",
-            celular: "3009876543",
-            correo_institucional: "ana.rodriguez@upc.edu.co",
-            correo_personal: "ana.rodriguez@hotmail.com",
-            preferencia_correo: "institucional",
-            facultad: "Ciencias Económicas",
-            estudiante_programa_academico: "Administración de Empresas",
-            asignaturas: "Gestión Empresarial, Liderazgo",
-            creditos_asignaturas: "6",
-            ciclo_formacion: "Profesional",
-            pregrado: "Administración de Empresas",
-            especializacion: "Gerencia Estratégica",
-            maestria: "MBA",
-            doctorado: "",
-            grupo_investigacion: "sí",
-            cual_grupo: "GIAE - Grupo de Investigación en Administración Empresarial",
-            horas_semanales: "36",
-            estado: "Activo",
-            createdAt: "2024-01-16T14:30:00Z",
-          },
-          {
-            id: 3,
-            nombres_apellidos: "Mg. Luis Fernando Pérez Torres",
-            documento_identidad: "5555666677",
-            fecha_nacimiento: "10/11/1985",
-            direccion_residencia: "Avenida Simón Bolívar #25-67, Valledupar",
-            celular: "3005556666",
-            correo_institucional: "luis.perez@upc.edu.co",
-            correo_personal: "luis.perez@yahoo.com",
-            preferencia_correo: "personal",
-            facultad: "Ciencias de la Salud",
-            estudiante_programa_academico: "Psicología",
-            asignaturas: "Psicología Clínica, Terapia Cognitiva",
-            creditos_asignaturas: "10",
-            ciclo_formacion: "Profesional",
-            pregrado: "Psicología",
-            especializacion: "Psicología Clínica",
-            maestria: "Psicología de la Salud",
-            doctorado: "",
-            grupo_investigacion: "no",
-            cual_grupo: "",
-            horas_semanales: "32",
-            estado: "Activo",
-            createdAt: "2024-01-17T09:15:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/fichas-docente`)
+      if (!response.ok) {
+        throw new Error(`Error al obtener fichas: ${response.statusText}`)
       }
-    }
 
-    if (showTable) {
-      loadTableData()
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
-  }, [showTable])
+  }
+
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -354,72 +282,91 @@ export default function FichaDocenteForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setNotification({
-        type: "success",
-        message: "Ficha docente registrada exitosamente",
-      })
-
-      // Agregar a la tabla local
-      const newRecord = {
-        id: Date.now(),
-        ...formData,
-        fecha_nacimiento: `${formData.fecha_nacimiento_dia}/${formData.fecha_nacimiento_mes}/${formData.fecha_nacimiento_ano}`,
-        estado: "Activo",
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        nombres_apellidos: "",
-        documento_identidad: "",
-        fecha_nacimiento_dia: "",
-        fecha_nacimiento_mes: "",
-        fecha_nacimiento_ano: "",
-        direccion_residencia: "",
-        celular: "",
-        correo_institucional: "",
-        correo_personal: "",
-        preferencia_correo: "",
-        facultad: "",
-        estudiante_programa_academico: "",
-        asignaturas: "",
-        creditos_asignaturas: "",
-        ciclo_formacion: "",
-        pregrado: "",
-        especializacion: "",
-        maestria: "",
-        doctorado: "",
-        grupo_investigacion: "",
-        cual_grupo: "",
-        horas_semanales: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar la ficha docente: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
+
+  setIsSubmitting(true)
+
+  try {
+    // Unifica fecha en formato dd/mm/yyyy
+    const fecha_nacimiento = `${formData.fecha_nacimiento_dia}/${formData.fecha_nacimiento_mes}/${formData.fecha_nacimiento_ano}`
+
+    const payload = {
+      ...formData,
+      fecha_nacimiento,
+      estado: "Activo",
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/fichas-docente`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error desconocido al registrar ficha")
+    }
+
+    const savedRecord = await response.json()
+
+    setNotification({
+      type: "success",
+      message: "Ficha docente registrada exitosamente",
+    })
+
+    const newRecord = {
+      id: savedRecord.id || Date.now(),
+      ...payload,
+      createdAt: new Date().toISOString(),
+    }
+
+    setTableData((prev) => [newRecord, ...prev])
+
+    // Limpiar formulario
+    setFormData({
+      nombres_apellidos: "",
+      documento_identidad: "",
+      fecha_nacimiento_dia: "",
+      fecha_nacimiento_mes: "",
+      fecha_nacimiento_ano: "",
+      direccion_residencia: "",
+      celular: "",
+      correo_institucional: "",
+      correo_personal: "",
+      preferencia_correo: "",
+      facultad: "",
+      estudiante_programa_academico: "",
+      asignaturas: "",
+      creditos_asignaturas: "",
+      ciclo_formacion: "",
+      pregrado: "",
+      especializacion: "",
+      maestria: "",
+      doctorado: "",
+      grupo_investigacion: "",
+      cual_grupo: "",
+      horas_semanales: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar la ficha docente: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
