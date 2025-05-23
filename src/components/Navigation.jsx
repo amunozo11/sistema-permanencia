@@ -70,8 +70,8 @@ export default function Navigation() {
           <div className="flex items-center bg-white text-institucional-verde1 rounded-xl mr-4 ml-2 p-1">
             <img src="/logo-upc.png" alt="Logo UPC" className="h-10 mr-3 ml-2" />
              <div className="mr-4">
-                <h1 className="text-2xl font-bold">Sistema de Permanencia Estudiantil</h1>
-                <p className="text-sm opacity-80">Universidad Popular del Cesar - Análisis de Datos</p>
+                <h1 className="text-2xl font-bold">SPE</h1>
+                <p className="text-sm opacity-80">Universidad Popular del Cesar</p>
               </div>
           </div>
 
