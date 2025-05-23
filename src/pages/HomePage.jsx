@@ -421,11 +421,6 @@ export default function HomePage() {
                         <UserCheck className="h-6 w-6 text-blue-500" />
                       </div>
                     </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="text-green-500 font-medium">2.5%</span>
-                      <span className="text-gray-500 ml-1">vs periodo anterior</span>
-                    </div>
                   </motion.div>
 
                   <motion.div
@@ -440,11 +435,6 @@ export default function HomePage() {
                       <div className="bg-red-100 p-3 rounded-lg">
                         <Percent className="h-6 w-6 text-red-500" />
                       </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <ArrowDownRight className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="text-green-500 font-medium">1.2%</span>
-                      <span className="text-gray-500 ml-1">vs periodo anterior</span>
                     </div>
                   </motion.div>
 
@@ -461,11 +451,6 @@ export default function HomePage() {
                         <GraduationCap className="h-6 w-6 text-green-500" />
                       </div>
                     </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="text-green-500 font-medium">3.7%</span>
-                      <span className="text-gray-500 ml-1">vs periodo anterior</span>
-                    </div>
                   </motion.div>
 
                   <motion.div
@@ -480,11 +465,6 @@ export default function HomePage() {
                       <div className="bg-purple-100 p-3 rounded-lg">
                         <BookOpen className="h-6 w-6 text-purple-500" />
                       </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="text-green-500 font-medium">1.2%</span>
-                      <span className="text-gray-500 ml-1">vs periodo anterior</span>
                     </div>
                   </motion.div>
                 </div>
