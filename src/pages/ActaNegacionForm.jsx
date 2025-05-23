@@ -266,7 +266,7 @@ export default function ActaNegacionForm() {
   setIsSubmitting(true)
 
   try {
-    const response = await fetch("https://backend-permanencia.onrender.com/api/acta-negacion", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/acta-negacion`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
