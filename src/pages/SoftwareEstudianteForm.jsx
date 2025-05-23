@@ -33,85 +33,48 @@ export default function SoftwareEstudianteForm() {
 
   // Cargar solicitudes al montar el componente
   useEffect(() => {
-    const fetchSolicitudes = async () => {
-      setIsLoadingSolicitudes(true)
-      try {
-        // Simular datos de solicitudes
-        const mockSolicitudes = [
-          {
-            _id: "1",
-            estudiante_programa_academico: "Ingeniería de Sistemas",
-            nombre_asignatura: "Programación Avanzada",
-            docente_tutor: "Dr. Carlos Mendoza",
-          },
-          {
-            _id: "2",
-            estudiante_programa_academico: "Ingeniería de Software",
-            nombre_asignatura: "Base de Datos",
-            docente_tutor: "Dra. Ana García",
-          },
-        ]
-        setSolicitudes(mockSolicitudes)
-      } catch (error) {
-        console.error("Error:", error)
-        setNotification({
-          type: "error",
-          message: "Error al cargar solicitudes: " + error.message,
-        })
-      } finally {
-        setIsLoadingSolicitudes(false)
-      }
+  const fetchSolicitudes = async () => {
+    setIsLoadingSolicitudes(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/solicitudes-software`)
+      if (!response.ok) throw new Error("No se pudieron obtener las solicitudes")
+      const data = await response.json()
+      setSolicitudes(data)
+    } catch (error) {
+      console.error("Error:", error)
+      setNotification({
+        type: "error",
+        message: "Error al cargar solicitudes: " + error.message,
+      })
+    } finally {
+      setIsLoadingSolicitudes(false)
     }
+  }
 
-    fetchSolicitudes()
-  }, [])
+  fetchSolicitudes()
+}, [])
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            id: 1,
-            solicitud_id: "1",
-            numero_identificacion: "1234567890",
-            nombre_estudiante: "Juan Carlos Pérez",
-            correo: "juan.perez@estudiante.upc.edu.co",
-            telefono: "3001234567",
-            semestre: 6,
-            programa: "Ingeniería de Sistemas",
-            asignatura: "Programación Avanzada",
-            docente: "Dr. Carlos Mendoza",
-            createdAt: "2024-01-15T10:00:00Z",
-          },
-          {
-            id: 2,
-            solicitud_id: "2",
-            numero_identificacion: "9876543210",
-            nombre_estudiante: "María Fernanda López",
-            correo: "maria.lopez@estudiante.upc.edu.co",
-            telefono: "3009876543",
-            semestre: 4,
-            programa: "Ingeniería de Software",
-            asignatura: "Base de Datos",
-            docente: "Dra. Ana García",
-            createdAt: "2024-01-16T14:30:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
-      }
-    }
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/software-estudiantes`)
+      if (!response.ok) throw new Error("Error al obtener los datos de estudiantes")
 
-    if (showTable) {
-      loadTableData()
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
-  }, [showTable])
+  }
+
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -247,58 +210,75 @@ export default function SoftwareEstudianteForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setNotification({
-        type: "success",
-        message: "Estudiante registrado exitosamente",
-      })
-
-      // Agregar a la tabla local
-      const selectedSolicitud = solicitudes.find((s) => s._id === formData.solicitud_id)
-      const newRecord = {
-        id: Date.now(),
-        ...formData,
-        programa: selectedSolicitud?.estudiante_programa_academico || "",
-        asignatura: selectedSolicitud?.nombre_asignatura || "",
-        docente: selectedSolicitud?.docente_tutor || "",
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        solicitud_id: "",
-        numero_identificacion: "",
-        nombre_estudiante: "",
-        correo: "",
-        telefono: "",
-        semestre: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar el estudiante: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
+
+  setIsSubmitting(true)
+
+  try {
+    const selectedSolicitud = solicitudes.find((s) => s._id === formData.solicitud_id)
+
+    const payload = {
+      ...formData,
+      programa: selectedSolicitud?.estudiante_programa_academico || "",
+      asignatura: selectedSolicitud?.nombre_asignatura || "",
+      docente: selectedSolicitud?.docente_tutor || "",
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/software-estudiantes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error al registrar estudiante")
+    }
+
+    const savedRecord = await response.json()
+
+    setNotification({
+      type: "success",
+      message: "Estudiante registrado exitosamente",
+    })
+
+    const newRecord = {
+      id: savedRecord.id || Date.now(),
+      ...payload,
+      createdAt: new Date().toISOString(),
+    }
+
+    setTableData((prev) => [newRecord, ...prev])
+
+    // Limpiar formulario
+    setFormData({
+      solicitud_id: "",
+      numero_identificacion: "",
+      nombre_estudiante: "",
+      correo: "",
+      telefono: "",
+      semestre: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar el estudiante: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
