@@ -51,7 +51,7 @@ export default function ActaNegacionForm() {
   const loadTableData = async () => {
     setIsLoadingTable(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/acta-negacion`)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/actas-negacion`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -266,7 +266,7 @@ export default function ActaNegacionForm() {
   setIsSubmitting(true)
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/acta-negacion`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/actas-negacion`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
