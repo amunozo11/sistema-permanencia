@@ -48,75 +48,27 @@ export default function ActaNegacionForm() {
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            id: 1,
-            nombre_estudiante: "María Fernanda Castillo",
-            documento_tipo: "C.C.",
-            documento_numero: "1234567890",
-            documento_expedido_en: "Valledupar",
-            estudiante_programa_academico: "Psicología",
-            semestre: "4",
-            fecha_firma_dia: "15",
-            fecha_firma_mes: "01",
-            fecha_firma_anio: "2024",
-            firma_estudiante: "María Fernanda Castillo",
-            documento_firma_estudiante: "1234567890",
-            docente_permanencia: "Dra. Carmen Rodríguez",
-            estado: "Procesada",
-            createdAt: "2024-01-15T10:00:00Z",
-          },
-          {
-            id: 2,
-            nombre_estudiante: "Carlos Eduardo Martínez",
-            documento_tipo: "C.C.",
-            documento_numero: "9876543210",
-            documento_expedido_en: "Aguachica",
-            estudiante_programa_academico: "Administración de Empresas",
-            semestre: "6",
-            fecha_firma_dia: "20",
-            fecha_firma_mes: "01",
-            fecha_firma_anio: "2024",
-            firma_estudiante: "Carlos Eduardo Martínez",
-            documento_firma_estudiante: "9876543210",
-            docente_permanencia: "Mg. Luis Pérez",
-            estado: "Pendiente",
-            createdAt: "2024-01-20T14:30:00Z",
-          },
-          {
-            id: 3,
-            nombre_estudiante: "Ana Sofía Guerrero",
-            documento_tipo: "T.I.",
-            documento_numero: "1122334455",
-            documento_expedido_en: "Bosconia",
-            estudiante_programa_academico: "Ingeniería de Sistemas",
-            semestre: "2",
-            fecha_firma_dia: "22",
-            fecha_firma_mes: "01",
-            fecha_firma_anio: "2024",
-            firma_estudiante: "Ana Sofía Guerrero",
-            documento_firma_estudiante: "1122334455",
-            docente_permanencia: "Dr. Roberto Silva",
-            estado: "Procesada",
-            createdAt: "2024-01-22T09:15:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/acta-negacion`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
+  }
 
-    if (showTable) {
-      loadTableData()
-    }
-  }, [showTable])
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
+
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -301,61 +253,74 @@ export default function ActaNegacionForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setNotification({
-        type: "success",
-        message: "Acta de negación registrada exitosamente",
-      })
-
-      // Agregar a la tabla local
-      const newRecord = {
-        id: Date.now(),
-        ...formData,
-        estado: "Procesada",
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        nombre_estudiante: "",
-        documento_tipo: "",
-        documento_numero: "",
-        documento_expedido_en: "",
-        estudiante_programa_academico: "",
-        semestre: "",
-        fecha_firma_dia: "",
-        fecha_firma_mes: "",
-        fecha_firma_anio: "",
-        firma_estudiante: "",
-        documento_firma_estudiante: "",
-        docente_permanencia: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar el acta: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
+
+  setIsSubmitting(true)
+
+  try {
+    const response = await fetch("https://backend-permanencia.onrender.com/api/acta-negacion", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error desconocido al enviar el acta")
+    }
+
+    const savedRecord = await response.json()
+
+    setNotification({
+      type: "success",
+      message: "Acta de negación registrada exitosamente",
+    })
+
+    // Agregar a la tabla local (si tu backend no retorna el acta completa, puedes ajustar esto)
+    const newRecord = {
+      id: savedRecord.id || Date.now(), // usar ID real si lo devuelve el backend
+      ...formData,
+      estado: "Procesada",
+      createdAt: new Date().toISOString(),
+    }
+
+    setTableData((prev) => [newRecord, ...prev])
+
+    // Limpiar formulario
+    setFormData({
+      nombre_estudiante: "",
+      documento_tipo: "",
+      documento_numero: "",
+      documento_expedido_en: "",
+      estudiante_programa_academico: "",
+      semestre: "",
+      fecha_firma_dia: "",
+      fecha_firma_mes: "",
+      fecha_firma_anio: "",
+      firma_estudiante: "",
+      documento_firma_estudiante: "",
+      docente_permanencia: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar el acta: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
