@@ -37,56 +37,24 @@ export default function RemisionPsicologicaForm() {
 
   // Cargar datos de la tabla
   useEffect(() => {
-    const loadTableData = async () => {
-      setIsLoadingTable(true)
-      try {
-        // Simular datos para demostración
-        const mockData = [
-          {
-            id: 1,
-            nombre_estudiante: "Juan Pérez García",
-            numero_documento: "1234567890",
-            estudiante_programa_academico_academico: "Ingeniería de Sistemas",
-            semestre: 5,
-            motivo_remision: "Ansiedad académica y dificultades de concentración",
-            docente_remite: "María González",
-            correo_docente: "maria.gonzalez@upc.edu.co",
-            telefono_docente: "3001234567",
-            fecha: "2024-01-15",
-            hora: "10:00",
-            tipo_remision: "individual",
-            observaciones: "Estudiante presenta síntomas de estrés",
-            createdAt: "2024-01-15T10:00:00Z",
-          },
-          {
-            id: 2,
-            nombre_estudiante: "Ana María López",
-            numero_documento: "9876543210",
-            estudiante_programa_academico_academico: "Administración de Empresas",
-            semestre: 3,
-            motivo_remision: "Problemas familiares que afectan el rendimiento",
-            docente_remite: "Carlos Rodríguez",
-            correo_docente: "carlos.rodriguez@upc.edu.co",
-            telefono_docente: "3009876543",
-            fecha: "2024-01-16",
-            hora: "14:30",
-            tipo_remision: "individual",
-            observaciones: "Requiere seguimiento continuo",
-            createdAt: "2024-01-16T14:30:00Z",
-          },
-        ]
-        setTableData(mockData)
-      } catch (error) {
-        console.error("Error al cargar datos:", error)
-      } finally {
-        setIsLoadingTable(false)
-      }
+  const loadTableData = async () => {
+    setIsLoadingTable(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/remisiones-psicologicas`)
+      if (!response.ok) throw new Error("Error al obtener remisiones")
+      const data = await response.json()
+      setTableData(data)
+    } catch (error) {
+      console.error("Error al cargar datos:", error)
+    } finally {
+      setIsLoadingTable(false)
     }
+  }
 
-    if (showTable) {
-      loadTableData()
-    }
-  }, [showTable])
+  if (showTable) {
+    loadTableData()
+  }
+}, [showTable])
 
   // Datos ordenados y filtrados
   const sortedAndFilteredData = useMemo(() => {
@@ -248,61 +216,74 @@ export default function RemisionPsicologicaForm() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Por favor, corrige los errores en el formulario",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Simular envío exitoso
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setNotification({
-        type: "success",
-        message: "Remisión psicológica registrada exitosamente",
-      })
-
-      // Agregar a la tabla local
-      const newRecord = {
-        id: Date.now(),
-        ...formData,
-        createdAt: new Date().toISOString(),
-      }
-      setTableData((prev) => [newRecord, ...prev])
-
-      // Limpiar formulario
-      setFormData({
-        nombre_estudiante: "",
-        numero_documento: "",
-        estudiante_programa_academico_academico: "",
-        semestre: "",
-        motivo_remision: "",
-        docente_remite: "",
-        correo_docente: "",
-        telefono_docente: "",
-        fecha: "",
-        hora: "",
-        tipo_remision: "",
-        observaciones: "",
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setNotification({
-        type: "error",
-        message: "Error al registrar la remisión psicológica: " + error.message,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!validateForm()) {
+    setNotification({
+      type: "error",
+      message: "Por favor, corrige los errores en el formulario",
+    })
+    return
   }
 
+  setIsSubmitting(true)
+
+  try {
+    const payload = { ...formData }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/remisiones-psicologicas`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Error al registrar la remisión")
+    }
+
+    const saved = await response.json()
+
+    setNotification({
+      type: "success",
+      message: "Remisión psicológica registrada exitosamente",
+    })
+
+    const newRecord = {
+      id: saved.id || Date.now(),
+      ...payload,
+      createdAt: saved.createdAt || new Date().toISOString(),
+    }
+
+    setTableData((prev) => [newRecord, ...prev])
+
+    setFormData({
+      nombre_estudiante: "",
+      numero_documento: "",
+      estudiante_programa_academico_academico: "",
+      semestre: "",
+      motivo_remision: "",
+      docente_remite: "",
+      correo_docente: "",
+      telefono_docente: "",
+      fecha: "",
+      hora: "",
+      tipo_remision: "",
+      observaciones: "",
+    })
+  } catch (error) {
+    console.error("Error:", error)
+    setNotification({
+      type: "error",
+      message: "Error al registrar la remisión psicológica: " + error.message,
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
+  
   const closeNotification = () => {
     setNotification({ type: "", message: "" })
   }
