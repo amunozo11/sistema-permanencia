@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 const programas = [
   "ADMINISTRACIÓN DE EMPRESAS", "ADMINISTRACIÓN DE EMPRESAS TURÍSTICAS Y HOTELERAS", "COMERCIO INTERNACIONAL", 
@@ -52,6 +52,27 @@ export default function ServiciosPermanencia() {
   const [servicioActivo, setServicioActivo] = useState(null)
   const [form, setForm] = useState({})
   const [errores, setErrores] = useState({})
+
+  // Referencias para cada título de formulario
+  const tituloRefs = {
+    tutoria: useRef(null),
+    psicologia: useRef(null),
+    vocacional: useRef(null),
+    comedor: useRef(null),
+  }
+
+  // Función para activar y navegar al título del formulario
+  const handleServicioClick = (key) => {
+    setServicioActivo(key)
+    setTimeout(() => {
+      const ref = tituloRefs[key]?.current
+      if (ref) {
+        ref.scrollIntoView({ behavior: "smooth", block: "start" })
+        // Opcional: enfocar el título para accesibilidad
+        ref.focus && ref.focus()
+      }
+    }, 100)
+  }
 
   // Validaciones según reglas de la tabla Estudiante y Servicios
   const validar = (key, campos) => {
@@ -196,8 +217,18 @@ export default function ServiciosPermanencia() {
     switch (key) {
       case "tutoria":
         return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Tutoría Académica (POA)</h4>
+          <form
+            className="bg-gray-50 p-4 rounded-xl shadow mt-4"
+            onSubmit={e => handleSubmit(e, key)}
+          >
+            <h4
+              className="font-semibold mb-2"
+              id="titulo-tutoria"
+              tabIndex={-1}
+              ref={tituloRefs.tutoria}
+            >
+              Registro de Tutoría Académica (POA)
+            </h4>
             {renderCamposEstudiante()}
             <label className="block text-xs font-semibold">Nivel de Riesgo *</label>
             <select className="border p-2 rounded w-full mb-2" name="nivel_riesgo" value={form.nivel_riesgo || ""} onChange={handleChange}>
@@ -220,8 +251,18 @@ export default function ServiciosPermanencia() {
         )
       case "psicologia":
         return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Asesoría Psicológica (POPS)</h4>
+          <form
+            className="bg-gray-50 p-4 rounded-xl shadow mt-4"
+            onSubmit={e => handleSubmit(e, key)}
+          >
+            <h4
+              className="font-semibold mb-2"
+              id="titulo-psicologia"
+              tabIndex={-1}
+              ref={tituloRefs.psicologia}
+            >
+              Registro de Asesoría Psicológica (POPS)
+            </h4>
             {renderCamposEstudiante()}
             <label className="block text-xs font-semibold">Motivo de Intervención *</label>
             <select className="border p-2 rounded w-full mb-2" name="motivo_intervencion" value={form.motivo_intervencion || ""} onChange={handleChange}>
@@ -247,8 +288,18 @@ export default function ServiciosPermanencia() {
         )
       case "vocacional":
         return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Orientación Vocacional (POVAU)</h4>
+          <form
+            className="bg-gray-50 p-4 rounded-xl shadow mt-4"
+            onSubmit={e => handleSubmit(e, key)}
+          >
+            <h4
+              className="font-semibold mb-2"
+              id="titulo-vocacional"
+              tabIndex={-1}
+              ref={tituloRefs.vocacional}
+            >
+              Registro de Orientación Vocacional (POVAU)
+            </h4>
             {renderCamposEstudiante()}
             <label className="block text-xs font-semibold">Tipo de Participante *</label>
             <select className="border p-2 rounded w-full mb-2" name="tipo_participante" value={form.tipo_participante || ""} onChange={handleChange}>
@@ -274,8 +325,18 @@ export default function ServiciosPermanencia() {
         )
       case "comedor":
         return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Comedor Universitario</h4>
+          <form
+            className="bg-gray-50 p-4 rounded-xl shadow mt-4"
+            onSubmit={e => handleSubmit(e, key)}
+          >
+            <h4
+              className="font-semibold mb-2"
+              id="titulo-comedor"
+              tabIndex={-1}
+              ref={tituloRefs.comedor}
+            >
+              Registro de Comedor Universitario
+            </h4>
             {renderCamposEstudiante()}
             <input className="border p-2 rounded w-full mb-2" name="condicion_socioeconomica" value={form.condicion_socioeconomica || ""} onChange={handleChange} placeholder="Condición Socioeconómica *" maxLength={100} />
             {errores.condicion_socioeconomica && <span className="text-red-500 text-xs">{errores.condicion_socioeconomica}</span>}
@@ -323,7 +384,7 @@ export default function ServiciosPermanencia() {
                   ? "bg-institucional-verde2 text-white"
                   : "bg-white hover:bg-institucional-verde1/10 text-institucional-verde2"
               }`}
-              onClick={() => setServicioActivo(servicioActivo === servicio.key ? null : servicio.key)}
+              onClick={() => handleServicioClick(servicio.key)}
             >
               <span className="text-2xl">{servicio.icono}</span>
               <span className="font-medium">{servicio.nombre}</span>
