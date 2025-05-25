@@ -36,28 +36,10 @@ export default function ServiciosPermanencia() {
       key: "psicologia"
     },
     {
-      nombre: "Apoyo Socioeconómico",
-      descripcion: "Registro de apoyos económicos y becas.",
-      icono: "💰",
-      key: "apoyo"
-    },
-    {
       nombre: "Programa de Orientación Vocacional y Adaptación Universitaria (POVAU)",
       descripcion: "Registro de orientación vocacional y seguimiento.",
-      icono: "🧭",
+      icono: "🧑‍🎓",
       key: "vocacional"
-    },
-    {
-      nombre: "Talleres de Habilidades",
-      descripcion: "Registro de talleres y actividades de desarrollo.",
-      icono: "⏱️",
-      key: "talleres"
-    },
-    {
-      nombre: "Seguimiento Académico",
-      descripcion: "Registro de seguimiento y evaluación académica.",
-      icono: "📊",
-      key: "seguimiento"
     },
     {
       nombre: "Comedor Universitario",
@@ -320,43 +302,6 @@ export default function ServiciosPermanencia() {
             <button className="bg-institucional-verde2 text-white px-4 py-2 rounded">Registrar</button>
           </form>
         )
-      // Para los servicios de apoyo y talleres, puedes personalizar los campos según tu modelo
-      case "apoyo":
-        return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Apoyo Socioeconómico</h4>
-            {renderCamposEstudiante()}
-            <input className="border p-2 rounded w-full mb-2" name="tipo_vulnerabilidad" value={form.tipo_vulnerabilidad || ""} onChange={handleChange} placeholder="Tipo de Vulnerabilidad (opcional)" maxLength={50} />
-            <textarea className="border p-2 rounded w-full mb-2" name="observaciones" value={form.observaciones || ""} onChange={handleChange} placeholder="Observaciones (opcional)" maxLength={255} />
-            <button className="bg-institucional-verde2 text-white px-4 py-2 rounded">Registrar</button>
-          </form>
-        )
-      case "talleres":
-        return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Taller de Habilidades</h4>
-            {renderCamposEstudiante()}
-            <input className="border p-2 rounded w-full mb-2" name="nombre_taller" value={form.nombre_taller || ""} onChange={handleChange} placeholder="Nombre del Taller *" maxLength={100} />
-            <input className="border p-2 rounded w-full mb-2" name="fecha_taller" value={form.fecha_taller || ""} onChange={handleChange} type="date" placeholder="Fecha del Taller *" />
-            <textarea className="border p-2 rounded w-full mb-2" name="observaciones" value={form.observaciones || ""} onChange={handleChange} placeholder="Observaciones (opcional)" maxLength={255} />
-            <button className="bg-institucional-verde2 text-white px-4 py-2 rounded">Registrar</button>
-          </form>
-        )
-      case "seguimiento":
-        return (
-          <form className="bg-gray-50 p-4 rounded-xl shadow mt-4" onSubmit={e => handleSubmit(e, key)}>
-            <h4 className="font-semibold mb-2">Registro de Seguimiento Académico</h4>
-            {renderCamposEstudiante()}
-            <label className="block text-xs font-semibold">Estado de Participación *</label>
-            <select className="border p-2 rounded w-full mb-2" name="estado_participacion" value={form.estado_participacion || ""} onChange={handleChange}>
-              <option value="">Seleccione...</option>
-              {estadoParticipacionOpciones.map(op => <option key={op} value={op}>{op}</option>)}
-            </select>
-            {errores.estado_participacion && <span className="text-red-500 text-xs">{errores.estado_participacion}</span>}
-            <textarea className="border p-2 rounded w-full mb-2" name="observaciones_permanencia" value={form.observaciones_permanencia || ""} onChange={handleChange} placeholder="Observaciones de Permanencia *" maxLength={200} />
-            <button className="bg-institucional-verde2 text-white px-4 py-2 rounded">Registrar</button>
-          </form>
-        )
       default:
         return (
           <div className="bg-gray-50 p-4 rounded-xl shadow mt-4 text-gray-500">
@@ -369,20 +314,23 @@ export default function ServiciosPermanencia() {
   return (
     <div className="bg-white rounded-xl p-6 shadow-md mt-8">
       <h3 className="text-2xl font-semibold mb-6 text-institucional-verde1">Servicios de Permanencia Estudiantil</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-2">
         {servicios.map((servicio) => (
-          <div key={servicio.key} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex flex-col items-center">
-            <div className="text-4xl mb-2">{servicio.icono}</div>
-            <h4 className="text-lg font-medium text-institucional-verde2 mb-2">{servicio.nombre}</h4>
-            <p className="text-gray-600 mb-4 text-center">{servicio.descripcion}</p>
+          <div key={servicio.key} className="border border-gray-200 rounded-lg">
             <button
-              className="bg-institucional-verde2 text-white px-4 py-2 rounded mt-auto"
+              className={`w-full flex items-center gap-4 px-6 py-4 text-left transition-colors rounded-lg focus:outline-none ${
+                servicioActivo === servicio.key
+                  ? "bg-institucional-verde2 text-white"
+                  : "bg-white hover:bg-institucional-verde1/10 text-institucional-verde2"
+              }`}
               onClick={() => setServicioActivo(servicioActivo === servicio.key ? null : servicio.key)}
             >
-              Registrar
+              <span className="text-2xl">{servicio.icono}</span>
+              <span className="font-medium">{servicio.nombre}</span>
+              <span className="ml-2 text-sm text-gray-500">{servicio.descripcion}</span>
             </button>
             {servicioActivo === servicio.key && (
-              <div className="w-full">{renderFormulario(servicio.key)}</div>
+              <div className="px-6 pb-6">{renderFormulario(servicio.key)}</div>
             )}
           </div>
         ))}
