@@ -520,7 +520,7 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer className="mt-12 p-6 bg-institucional-verde1 text-white">
+      <footer className="mt-12 p-6 bg-institucional-verde1 text-white rounded-3xl">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div>
