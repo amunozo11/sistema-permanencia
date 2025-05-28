@@ -16,6 +16,8 @@ import {
   GraduationCap,
   BookOpen,
   Upload,
+  PersonStanding,
+  User2,
 } from "lucide-react"
 
 // Componentes
@@ -30,6 +32,7 @@ import ServiciosPermanencia from "../components/ServiciosPermanencia"
 import CSVUploader from "../components/CSVUploader"
 import Header from "../components/Header"
 import EstratoServicioChart from "../components/EstratoServicioChart"
+import { PiUser } from "react-icons/pi"
 
 export default function HomePage() {
   // Estado para almacenar los datos
@@ -48,7 +51,7 @@ export default function HomePage() {
 
   // Estados para datos derivados
   const [stats, setStats] = useState({
-    totals: { inscritos: 0, matriculados: 0, desertores: 0, graduados: 0 },
+    totals: { inscritos: 0, matriculados: 0, desertores: 0, graduados: 0, id: 0 },
     programaStats: [],
     riesgoDesercionData: [],
     tutoriaData: [],
@@ -57,6 +60,7 @@ export default function HomePage() {
     edadDesertores: [],
     estratoInscritos: [],
   })
+  
 
   // Cargar datos al iniciar
   useEffect(() => {
@@ -412,9 +416,9 @@ export default function HomePage() {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">Estudiantes Matriculados</p>
+                        <p className="text-sm text-gray-500 mb-1">Estudiantes Inscritos</p>
                         <h3 className="text-3xl font-bold text-gray-800">
-                          {stats.totals.matriculados.toLocaleString()}
+                          {stats.totals.inscritos}
                         </h3>
                       </div>
                       <div className="bg-blue-100 p-3 rounded-lg">
@@ -459,11 +463,11 @@ export default function HomePage() {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">Carga Estudiantil</p>
-                        <h3 className="text-3xl font-bold text-gray-800">{additionalKPIs.retencion}%</h3>
+                        <p className="text-sm text-gray-500 mb-1">Total de registros</p>
+                        <h3 className="text-3xl font-bold text-gray-800">{filteredData.length}</h3>
                       </div>
                       <div className="bg-purple-100 p-3 rounded-lg">
-                        <BookOpen className="h-6 w-6 text-purple-500" />
+                        <User2 className="h-6 w-6 text-purple-500" />
                       </div>
                     </div>
                   </motion.div>

@@ -14,17 +14,6 @@ const ESTRATO_COLORS = {
 }
 
 export default function ServiciosEstratoChart({ data }) {
-  // data: [{ servicio, cantidad }], pero aquí queremos un objeto:
-  // { servicio: "POVAU", "1": 40, "2": 80, ... }
-  // Suponemos que te pasan stats.estratoInscritos que es [{ estrato, inscritos }, ...]
-  // y stats.serviciosData que es [{ servicio, cantidad }, ...]
-  // Para esta gráfica necesitas RAW de todos los registros de DatosPermanencia
-  // con campos { servicio, estrato }.
-
-  // Si en tu HomePage no tienes ese raw, pásalo aquí. 
-  // Asumiré que data viene ya como [{ servicio, estrato }...], preresumido.
-
-  // Agrupar  
   const grouped = {}
   data.forEach(({ servicio, estrato }) => {
     if (!grouped[servicio]) grouped[servicio] = { servicio }
