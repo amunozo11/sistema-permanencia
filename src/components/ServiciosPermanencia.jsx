@@ -1095,23 +1095,25 @@ export default function ServiciosPermanencia() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+    <div className="min-h-screen p-4 mt-20">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Servicios de Permanencia Estudiantil</h1>
           <p className="text-gray-600 text-lg">Sistema integral de registro y seguimiento para estudiantes UNIPAZ</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-10 mt-28">
           {servicios.map((servicio) => (
             <div
               key={servicio.key}
               className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
               onClick={() => setServicioActivo(servicio.key)}
             >
-              <div className={`bg-gradient-to-r ${servicio.color} p-6 rounded-t-xl text-white`}>
-                <div className="flex items-center justify-center mb-3">{servicio.icono}</div>
-                <h3 className="text-lg font-bold text-center">{servicio.nombre}</h3>
+              <div className={`bg-gradient-to-r ${servicio.color} p-6 rounded-t-xl text-white h-[140px]`}>
+                <div className="flex flex-col h-full gap-4 items-center">
+                  {servicio.icono}
+                  <h3 className="text-lg font-bold text-center">{servicio.nombre}</h3>
+                </div>
               </div>
               <div className="p-6">
                 <p className="text-gray-600 text-center mb-4">{servicio.descripcion}</p>
