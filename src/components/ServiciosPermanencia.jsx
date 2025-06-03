@@ -1797,7 +1797,7 @@ const ServiciosPermanencia = () => {
         React.createElement(
           "p",
           { className: "text-gray-600 text-lg" },
-          "Sistema integral de registro y seguimiento para estudiantes UNIPAZ",
+          "Sistema integral de registro y seguimiento para estudiantes UPC",
         ),
       ),
       React.createElement(
